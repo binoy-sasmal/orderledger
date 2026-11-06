@@ -36,3 +36,7 @@ src = ["src", "tests"]
 select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501", "B008"]  # long SQL strings are deliberate; typer defaults are idiomatic
 
+
+[tool.ruff.lint.per-file-ignores]
+# orderledger_common must be imported first: it puts the shared stdlib-only helpers on sys.path.
+"airflow/dags/*.py" = ["I001"]

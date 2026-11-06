@@ -1,114 +1,129 @@
-# orderledger
+# OrderLedger
 
-An incremental analytics warehouse that keeps business metrics correct when source records
-arrive late, change, repeat or need reprocessing. Built on the public Olist e-commerce dataset,
-with Python, DuckDB and dbt.
+**An incremental analytics warehouse for trustworthy order and delivery metrics.**
 
-> **Portfolio project.** One developer, historical data, no users, no production deployment.
-> Nothing here is production experience, and no performance or scale claim is made beyond what
-> `docs/evidence-report.md` records from actual runs.
+OrderLedger models 99,441 e-commerce orders with **Python, SQL, dbt and DuckDB**. It handles duplicate events, corrections and late arrivals, checks the resulting metrics, and publishes them only when validation passes. Failed runs preserve the last successful output; targeted backfills repair stale reporting dates.
 
-## The problem
+Built as a personal project on the public Olist dataset, it demonstrates dimensional modelling, incremental transformations, data-quality gates and recovery from failed runs.
 
-An analyst needs trustworthy daily order metrics (orders, GMV, on-time delivery) from a source
-that keeps changing: delivery times get corrected, prices get corrected, orders get deleted,
-events arrive twice or out of order or weeks late. The warehouse has to publish the same numbers
-whether it processes the history in one pass, weekly, or fortnightly, survive a crash halfway
-through a run, and **refuse to publish** a number it cannot reconcile.
+[Evidence report](docs/evidence-report.md) · [Data model](docs/data-model.md) · [Demo transcript](docs/demo-transcript.txt) · [CI](https://github.com/binoy-sasmal/orderledger/actions)
 
-## What is real and what is synthetic
+## Verified results
 
-Olist is a set of **static** tables. It has no change feed, no arrival times, no returns, no
-deletions and no cancellation timestamp. This project therefore builds a deterministic **replay
-layer** that turns the static rows into a batched event history:
+Recorded full-data runs on 6 November 2026:
 
-* event content and lifecycle timestamps are **real Olist fields**;
-* arrival time and batch membership are **always simulated**;
-* duplicates, late arrivals, corrections, deletions and out-of-order arrivals are **synthetic**,
-  requested by a scenario file and labelled in every event (`content_origin`, `scenario_tag`);
-* cancellation is only an observed status snapshot; no cancellation time is invented.
+| Check | Result |
+|---|---|
+| Input | 99,441 orders; 643,721 event records, including labelled synthetic changes and duplicates |
+| Incremental processing versus full replay | Zero differing rows across all eight published tables after required backfills |
+| Different batch boundaries | The 56-batch and 28-batch runs produced identical final tables |
+| Business metrics | Order counts, gross merchandise value, delivered counts and on-time counts matched both a Python reference and, on the unmodified source scenario, direct SQL over the CSVs |
+| Late corrections | Reconciliation identified stale dates and blocked publication; targeted backfills repaired them |
+| Automated checks | 35 tests passed locally and in GitHub Actions on synthetic fixtures when first recorded; the suite now has 56 tests locally |
+| Orchestration (synthetic fixture only) | Local Airflow 3.4.0 ran scheduled replay batches, retried an injected transient failure, refused to retry deterministic reconciliation failures, repaired stale dates through a parameterised backfill DAG, and serialized overlapping writers. Final tables equalled a single-pass replay. See [orchestration evidence](docs/orchestration-evidence.md) |
 
-Details: [docs/contracts.md](docs/contracts.md).
+The [evidence report](docs/evidence-report.md) links to recorded results, explains the scenarios and reports measured runtimes. These results demonstrate correctness under the tested conditions; they do not establish a performance advantage for incremental processing.
 
-## How it works
+## Architecture
 
-```
-Olist CSVs -> simulate -> events/*.parquet + manifest -> load (validated, idempotent)
-  -> raw.events -> dbt facts -> dbt aggregates -> tests + reconciliation
-  -> publish (all-or-nothing) -> published.*
-```
-
-* **Incremental by key, from full history.** An order with any new event is rebuilt from all its
-  events, so the result cannot depend on how events were batched.
-* **Watermark and lookback.** A published watermark marks what is processed. Aggregates restate
-  a lookback window anchored to the *simulated* checkpoint. A late correction that moves an order
-  off an old date is caught by reconciliation, which fails the run; `backfill` repairs exactly
-  those dates ([docs/late-data.md](docs/late-data.md)).
-* **Write-audit-publish.** Nothing reaches `published` unless dbt tests and source-to-fact-to-
-  metric reconciliation pass ([docs/architecture.md](docs/architecture.md)).
-* **Operational record.** Every run, including failures, is logged in `ctl.run_log`; freshness is
-  reported separately for simulated source time and real execution time.
-
-**Result on the full Olist data** (99k orders, 643k events, 56 and 28 batches): incremental runs
-equal a single-pass replay with zero differing rows; reconciliation refused to publish and a
-targeted backfill repaired it whenever a late correction fell outside the lookback. See the
-[evidence report](docs/evidence-report.md), [gap mapping](docs/gap-mapping.md) and
-[demo transcript](docs/demo-transcript.txt). Not built: Airflow and any cloud-platform run.
-
-Documents: [metric definitions](docs/metrics.md), [data model](docs/data-model.md),
-[design decisions](docs/decisions/README.md), [guarantees per platform](docs/guarantees.md),
-[acceptance tests](docs/acceptance.md).
-
-## Setup
-
-Requires [uv](https://docs.astral.sh/uv/) and Python 3.12.
-
-```
-uv sync
-uv run pytest                      # synthetic fixture only; takes several minutes
+```mermaid
+flowchart TD
+    O["Airflow in Docker: scheduled replay and manual backfill DAGs"] -.-> P["Python CLI: selective retries and workspace writer lock"]
+    P -. coordinates .-> D
+    P -. coordinates .-> J
+    A["Olist CSVs"] --> B["Deterministic replay layer"]
+    B --> C["Parquet event batches and source inventory"]
+    C --> D["Validated, idempotent loader"]
+    D --> E["Append-only raw events"]
+    E --> F["dbt work schema: facts, dimensions and daily metrics"]
+    F --> G{"dbt tests and reconciliation pass?"}
+    G -->|Yes| H["One DuckDB transaction: publish eight tables and advance watermark"]
+    G -->|No| I["Preserve published output and record failure"]
+    I --> J["Retry or backfill affected dates"]
+    J --> F
 ```
 
-### Run on the synthetic fixture
+A Python CLI coordinates loading, dbt builds, validation and publication. The raw history remains available for replay, while the `published` schema contains the last successfully validated result. See the [architecture](docs/architecture.md) and [transaction guarantees](docs/guarantees.md).
 
+## Engineering decisions
+
+- **Recompute changed orders from their full history.** New events identify affected keys; rebuilding those keys from retained history makes results independent of arrival order and batch boundaries.
+- **Separate purchase and delivery reporting.** Order and item facts, customer/product/date dimensions and lifecycle intervals feed separate daily purchase and delivery aggregates. Each metric has an explicit population, denominator and time basis. See the [model](docs/data-model.md) and [metric definitions](docs/metrics.md).
+- **Make late-data recovery explicit.** Aggregates use a seven-day lookback plus affected new dates. Corrections that leave older dates stale fail reconciliation and identify the dates to backfill. See the [late-data walkthrough](docs/late-data.md).
+- **Publish atomically after validation.** dbt tests and source-to-fact-to-metric reconciliation run before all published tables and the watermark are updated in one DuckDB transaction. A failed build or publication attempt preserves the previous output.
+- **Cross-check through different paths.** A source inventory checks expected event counts, a Python reference checks headline metrics, and direct SQL over the source CSVs checks the unmodified-data scenario. The reference shares authorship with the warehouse; the CSV comparison bypasses the event replay layer.
+- **Keep source anomalies visible.** Inconsistent lifecycle timestamps are flagged and excluded from delivery metrics instead of silently repaired. Customer and product dimensions use Type 1 updates; the source does not justify claiming verified customer address history.
+
+## Data and scope
+
+Olist contains historical order snapshots and lifecycle timestamps, not a live change feed. The replay layer derives events from those fields. **Arrival times and batch membership are simulated; duplicates, corrections, deletions and delayed arrivals are synthetic and labelled.** Cancellation remains an observed status, without an invented cancellation time. See the [event contracts](docs/contracts.md).
+
+The implemented warehouse runs locally on DuckDB. Local Airflow orchestration (scheduling, retries, targeted backfill, single-writer protection) is implemented and was verified on the synthetic fixture, not on the full Olist data; cloud-platform execution is not implemented. The single-writer publication guarantees are specific to this implementation. At the measured dataset size, a full replay was faster than a typical incremental batch; runtime details and remaining gaps are documented in the [evidence report](docs/evidence-report.md) and [gap mapping](docs/gap-mapping.md).
+
+## Run the project
+
+Requires Python 3.12 and [uv](https://docs.astral.sh/uv/). Run commands from the repository root.
+
+```sh
+uv sync --frozen
+uv run pytest
 ```
-uv run python scripts/demo.py      # normal run, crash+retry, late data, backfill, reconciliation
+
+The tests use synthetic fixtures and require no Olist download or credentials. GitHub Actions runs lint and the test suite on pushes to `main` and pull requests.
+
+### Walk through failure and recovery
+
+```sh
+uv run python scripts/demo.py
 ```
 
-### Run on the real Olist data
+The script demonstrates a normal run, an injected failure and retry, a late correction, a targeted backfill and reconciliation. It recreates its dedicated `warehouse/demo` directory on each run. A recorded [demo transcript](docs/demo-transcript.txt) is available without running the project.
 
-The dataset is CC BY-NC-SA 4.0 and is not in this repo. Follow
-[docs/data-acquisition.md](docs/data-acquisition.md), then:
+### Orchestrate with Airflow (local, Docker)
 
+Requires Docker Desktop. Uses the synthetic fixture, so no Kaggle login is needed.
+
+```sh
+uv run python airflow/demo.py
 ```
+
+The script rebuilds a local Airflow 3.4.0 stack from scratch (generated secrets, image pinned by digest), runs scheduled replay batches, injects a transient failure that Airflow retries, shows a reconciliation failure that is not retried, repairs it through the backfill DAG, and checks 23 outcomes (about 20 minutes). Design, scope and limits: [docs/orchestration.md](docs/orchestration.md).
+
+### Run on the full Olist dataset
+
+Follow the [data acquisition instructions](docs/data-acquisition.md), then:
+
+```sh
 uv run orderledger check-data data/olist
-uv run orderledger profile data/olist --out docs/source-profile.md
 uv run orderledger simulate data/olist --scenario scenarios/ci.yml --ws warehouse/main
-uv run orderledger run --ws warehouse/main --through 1     # then 2, 3, ... or omit --through
+uv run orderledger run --ws warehouse/main --through 1
 uv run orderledger status --ws warehouse/main
 uv run orderledger reconcile --ws warehouse/main
-uv run orderledger backfill --ws warehouse/main --auto     # after a stale-date failure
-uv run orderledger freshness --ws warehouse/main --expected-through 2018-10-01
 ```
 
-## Layout
+Advance `--through` to process later batches. If reconciliation reports stale dates, repair the loaded history with:
 
-| Path | Purpose |
+```sh
+uv run orderledger backfill --ws warehouse/main --auto
+```
+
+Omit `--through` to process all available batches in one run. Source freshness uses the simulated checkpoint; execution freshness uses actual run time.
+
+## Repository guide
+
+| Path | Contents |
 |---|---|
-| `src/orderledger/` | simulator, loader, pipeline, reconciliation, CLI, reference implementation |
-| `dbt/` | staging, facts, dimensions, aggregates, metric macros, tests |
-| `tests/` | acceptance tests on an independently authored synthetic fixture |
-| `scenarios/` | scenario files describing the synthetic perturbations |
-| `docs/` | design, metrics, decisions, acceptance, evidence |
+| `src/orderledger/` | Replay layer, loader, pipeline, reconciliation, CLI and Python reference |
+| `dbt/` | SQL models, metric macros and data tests |
+| `tests/` | Acceptance tests and synthetic fixtures |
+| `scenarios/` | Reproducible change and arrival scenarios |
+| `airflow/` | Local Airflow image, compose file, DAGs, DAG checks and the scripted demo |
+| [docs/acceptance.md](docs/acceptance.md) | Acceptance criteria and test coverage |
+| [docs/decisions/](docs/decisions/README.md) | Design decisions and tradeoffs |
+| [docs/evidence-report.md](docs/evidence-report.md) | Full-data results, runtime measurements and limitations |
+| [docs/orchestration.md](docs/orchestration.md) | Airflow design, retry policy, backfill and concurrency scope |
+| [docs/orchestration-evidence.md](docs/orchestration-evidence.md) | Recorded Airflow runs (synthetic fixture) |
 
-## Limits
+## Attribution and licence
 
-* Historical data replayed on a simulated clock; no scheduler in production, no live users.
-* DuckDB allows one writer; the all-or-nothing publish relies on it and does not transfer
-  unchanged to other platforms ([docs/guarantees.md](docs/guarantees.md)).
-* The Python reference implementation shares an author with the warehouse; it is a cross-check,
-  not independent verification.
-* Olist volumes are small (under a million events); this demonstrates correctness, not scale.
-
-## Data attribution and licence
-
-Code: MIT. Data: Olist Brazilian E-Commerce Public Dataset, CC BY-NC-SA 4.0 (see `NOTICE.md`).
+Code is MIT licensed. The Olist Brazilian E-Commerce Public Dataset is licensed under CC BY-NC-SA 4.0 and is not included in this repository. See [NOTICE.md](NOTICE.md) for attribution and data-derived material.

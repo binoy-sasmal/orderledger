@@ -87,3 +87,23 @@ releases conflict with dbt-core's `pathspec` pin; `ruff` and the tests are the c
 
 Local DuckDB work shows modelling, SQL, dbt, incremental logic and correctness. It does not close
 the cloud warehouse gap. A bounded platform stage (M7) is planned and is claimed only if it runs.
+
+## ADR-010: Airflow coordinates; exit codes carry the retry decision
+
+**Decision.** Airflow runs the unchanged CLI, one task per step, and decides only when to run and
+whether to retry. The CLI exits 75 (retryable: lock busy, crash, infrastructure) or 1
+(deterministic: contract, test, reconciliation). Airflow retries the first and fails the second
+with `AirflowFailException`.
+**Why.** Retrying a data-quality failure cannot fix it and hides it. Keeping business logic out of
+the DAGs keeps it testable without Airflow.
+**Backfill is manual.** A failed reconciliation is not repaired automatically; a separate DAG with
+validated parameters repairs named dates on request. Auto-repair would silence the check.
+**Concurrency.** A one-slot Airflow pool serializes warehouse tasks; a file lock in the CLI rejects
+any other writer. Both are local to one machine and one shared volume.
+**Scheduling.** Interval k replays batch k+1 from an anchor; `catchup=True`. `depends_on_past` keeps
+batch order. `max_active_runs=1` was rejected after it deadlocked when a failed run was cleared
+(see orchestration-evidence.md).
+**Executor.** LocalExecutor with Postgres, not the official Celery stack: no workers, broker or
+Flower are needed for a single-writer, single-machine demo.
+**Would change if.** The warehouse moved to a platform with real concurrent writers, or a managed
+orchestrator were required.

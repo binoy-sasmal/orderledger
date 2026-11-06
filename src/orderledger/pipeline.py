@@ -23,6 +23,7 @@ from pathlib import Path
 
 from .db import PUBLISHED_TABLES, connect, db_path
 from .load import LoadError, load_batches
+from .locking import WorkspaceBusy, workspace_lock
 from .reconcile import Check, run_checks
 
 DBT_DIR = Path(__file__).resolve().parents[2] / "dbt"
@@ -30,14 +31,25 @@ STEPS = ("load", "facts", "marts", "tests", "recon", "publish")
 
 
 class PipelineError(Exception):
-    def __init__(self, step: str, message: str):
+    """A run failed. `retryable` separates infrastructure trouble (a retry is safe and may
+    succeed) from deterministic failures (contract, test, reconciliation: a retry cannot help
+    and the data problem must stay visible)."""
+
+    def __init__(self, step: str, message: str, retryable: bool = False):
         super().__init__(f"[{step}] {message}")
         self.step = step
         self.message = message
+        self.retryable = retryable
 
 
 class InjectedFailure(PipelineError):
     """Raised on purpose by tests and the demo to simulate a crash after a step."""
+
+    def __init__(self, step: str, message: str):
+        super().__init__(step, message, retryable=True)
+
+
+_TRANSIENT = re.compile(r"IO Error|Could not set lock|database is locked|Out of Memory|OutOfMemory", re.I)
 
 
 @dataclass
@@ -76,7 +88,10 @@ def run_dbt(ws: Path, command: str, select: str, variables: dict) -> None:
     text = (res.stdout or "") + (res.stderr or "")
     keep = [ln.strip() for ln in text.splitlines()
             if re.search(r"Failure in|Error|FAIL|ERROR|Got \d+ result", ln)]
-    raise PipelineError("dbt", " | ".join(keep[:12]) or text[-800:])
+    # A killed process (negative code on POSIX) or a lock/IO/memory error is infrastructure
+    # trouble. A failed test or a SQL error in a model is deterministic.
+    retryable = res.returncode < 0 or bool(_TRANSIENT.search(text))
+    raise PipelineError("dbt", " | ".join(keep[:12]) or text[-800:], retryable=retryable)
 
 
 def auto_backfill_window(ws: Path) -> tuple[dt.date, dt.date] | None:
@@ -97,14 +112,58 @@ def _inject(fail_after: str | None, step: str) -> None:
         raise InjectedFailure(step, "injected failure (simulated crash)")
 
 
+def _inject_once(ws: Path, spec: tuple[str, str] | None, step: str) -> None:
+    """Crash once after `step`, then never again for the same token (survives retries because the
+    marker is on disk). `spec` is (step, token)."""
+    if spec is None or spec[0] != step:
+        return
+    marker = ws / ".inject" / f"{re.sub(r'[^A-Za-z0-9_.-]', '_', spec[1])}-{step}"
+    if marker.exists():
+        return
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_text("injected\n", encoding="utf-8")
+    raise InjectedFailure(step, f"injected transient failure after {step} (once, token {spec[1]})")
+
+
 def run_pipeline(
     ws: Path,
     through: int | None = None,
     lookback_days: int = 7,
     kind: str = "run",
-    force: tuple[dt.date, dt.date] | None = None,
+    force: tuple[dt.date, dt.date] | str | None = None,
     fail_after: str | None = None,
+    lock_wait: float = 0.0,
+    inject_once: tuple[str, str] | None = None,
 ) -> RunOutcome:
+    """Run the pipeline while holding the exclusive workspace lock.
+
+    `force` may be a (from, to) window or "auto" (the dates reconciliation flags as stale,
+    determined under the lock). With nothing stale, "auto" returns a no-op outcome.
+    """
+    try:
+        with workspace_lock(ws, lock_wait):
+            if force == "auto":
+                force = auto_backfill_window(ws)
+                if force is None:
+                    return RunOutcome(run_id="-", status="noop")
+            return _run_locked(ws, through, lookback_days, kind, force, fail_after, inject_once)
+    except WorkspaceBusy as e:
+        raise PipelineError("lock", str(e), retryable=True) from e
+
+
+def _run_locked(
+    ws: Path,
+    through: int | None,
+    lookback_days: int,
+    kind: str,
+    force: tuple[dt.date, dt.date] | None,
+    fail_after: str | None,
+    inject_once: tuple[str, str] | None,
+) -> RunOutcome:
+    def inj(step: str) -> None:
+        _inject(fail_after, step)
+        _inject_once(ws, inject_once, step)
+
     started = time.monotonic()
     run_id = uuid.uuid4().hex[:12]
     con = connect(ws)
@@ -129,7 +188,7 @@ def run_pipeline(
             raise PipelineError("load", "no batches loaded")
         out.checkpoint_date, out.batches_loaded, out.rows_loaded = lr.checkpoint_date, lr.batches_loaded, lr.rows_loaded
         con.close()
-        _inject(fail_after, "load")
+        inj("load")
 
         variables = {
             "watermark": wm_before,
@@ -140,13 +199,13 @@ def run_pipeline(
         }
         step = "facts"
         run_dbt(ws, "build", "tag:facts", variables)
-        _inject(fail_after, "facts")
+        inj("facts")
         step = "marts"
         run_dbt(ws, "build", "tag:marts", variables)
-        _inject(fail_after, "marts")
+        inj("marts")
         step = "tests"
         run_dbt(ws, "test", "tag:cross", variables)
-        _inject(fail_after, "tests")
+        inj("tests")
 
         step = "recon"
         con = connect(ws)
@@ -158,7 +217,7 @@ def run_pipeline(
         failed = [c for c in out.checks if c.status == "fail"]
         if failed:
             raise PipelineError("recon", "; ".join(f"{c.name}: {c.detail}" for c in failed))
-        _inject(fail_after, "recon")
+        inj("recon")
 
         step = "publish"
         wm_after = con.execute("select coalesce(max(arrival_seq), 0) from raw.events").fetchone()[0]
@@ -166,7 +225,7 @@ def run_pipeline(
         try:
             for t in PUBLISHED_TABLES:
                 con.execute(f"create or replace table published.{t} as select * from work.{t}")
-            _inject(fail_after, "publish")  # crash before commit: nothing becomes visible
+            inj("publish")  # crash before commit: nothing becomes visible
             con.execute(
                 "update ctl.state set watermark = ?, checkpoint_date = ?, last_run_id = ?, "
                 "published_at = now()::timestamp where id = 1",

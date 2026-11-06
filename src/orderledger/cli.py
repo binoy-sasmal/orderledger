@@ -8,7 +8,8 @@ from pathlib import Path
 import typer
 
 from .db import connect
-from .pipeline import STEPS, PipelineError, auto_backfill_window, run_pipeline
+from .orchestration import EXIT_DETERMINISTIC, EXIT_RETRYABLE, EXIT_STALE_SOURCE
+from .pipeline import STEPS, run_pipeline
 from .reconcile import run_checks
 
 app = typer.Typer(no_args_is_help=True, add_completion=False, help=__doc__)
@@ -44,19 +45,40 @@ def _print_run(out) -> None:
         typer.echo(f"  [{c.status:7}] {c.name}: {c.detail}")
 
 
+def _fail(e: BaseException) -> typer.Exit:
+    """Exit code tells a scheduler whether a retry can help: 75 retryable, 1 deterministic."""
+    retryable = getattr(e, "retryable", False) or isinstance(e, OSError)
+    typer.echo(f"FAILED {'(retryable) ' if retryable else '(deterministic) '}{e}", err=True)
+    return typer.Exit(EXIT_RETRYABLE if retryable else EXIT_DETERMINISTIC)
+
+
+def _inject_spec(step: str | None, token: str | None):
+    if step is None:
+        return None
+    if step not in STEPS:
+        typer.echo(f"--inject-failure-once must be one of {', '.join(STEPS)}", err=True)
+        raise typer.Exit(2)
+    return (step, token or "default")
+
+
 @app.command()
 def run(
     ws: Path = WS,
     through: int = typer.Option(None, help="Load batches up to this number (default: all)."),
     lookback_days: int = typer.Option(7, help="Restate aggregate dates this close to the checkpoint."),
     fail_after: str = typer.Option(None, help=f"Test hook: crash after a step ({', '.join(STEPS)})."),
+    lock_wait: float = typer.Option(0.0, help="Seconds to wait for the workspace write lock (0 = reject at once)."),
+    inject_failure_once: str = typer.Option(None, help="Test hook: crash once after this step, then never for the same token."),
+    inject_token: str = typer.Option(None, help="Identifies the 'once' for --inject-failure-once."),
 ) -> None:
-    """Load pending batches, build, test, reconcile and publish. Exits 1 if anything fails."""
+    """Load pending batches, build, test, reconcile and publish.
+
+    Exit codes: 0 ok; 1 deterministic failure (do not retry); 75 retryable (lock busy, crash)."""
     try:
-        _print_run(run_pipeline(ws, through, lookback_days, fail_after=fail_after))
-    except PipelineError as e:
-        typer.echo(f"FAILED {e}", err=True)
-        raise typer.Exit(1) from e
+        _print_run(run_pipeline(ws, through, lookback_days, fail_after=fail_after, lock_wait=lock_wait,
+                                inject_once=_inject_spec(inject_failure_once, inject_token)))
+    except Exception as e:
+        raise _fail(e) from e
 
 
 @app.command()
@@ -66,24 +88,38 @@ def backfill(
     date_to: str = typer.Option(None, "--to", help="Last date to recompute (inclusive)."),
     auto: bool = typer.Option(False, help="Recompute the dates reconciliation flags as stale."),
     lookback_days: int = typer.Option(7),
+    lock_wait: float = typer.Option(0.0, help="Seconds to wait for the workspace write lock."),
 ) -> None:
-    """Recompute orders and aggregates whose purchase or delivery date is in a window."""
+    """Recompute orders and aggregates whose purchase or delivery date is in a window.
+
+    Warehouse repair of stale dates. It is not an Airflow catchup of scheduled intervals."""
     if auto:
-        window = auto_backfill_window(ws)
-        if window is None:
-            typer.echo("nothing stale")
-            return
+        window = "auto"
     elif date_from and date_to:
         window = (_date(date_from), _date(date_to))
     else:
         typer.echo("give --from and --to, or --auto", err=True)
         raise typer.Exit(2)
-    typer.echo(f"backfilling {window[0]} .. {window[1]}")
     try:
-        _print_run(run_pipeline(ws, None, lookback_days, kind="backfill", force=window))
-    except PipelineError as e:
-        typer.echo(f"FAILED {e}", err=True)
-        raise typer.Exit(1) from e
+        out = run_pipeline(ws, None, lookback_days, kind="backfill", force=window, lock_wait=lock_wait)
+    except Exception as e:
+        raise _fail(e) from e
+    if out.status == "noop":
+        typer.echo("nothing stale")
+        return
+    _print_run(out)
+
+
+@app.command("hold-lock")
+def hold_lock(ws: Path = WS, seconds: float = typer.Option(10.0)) -> None:
+    """Test aid: hold the workspace write lock for a while, to show a second writer is rejected."""
+    import time
+
+    from .locking import workspace_lock
+
+    with workspace_lock(ws, 0):
+        typer.echo(f"holding the write lock on {ws} for {seconds:g}s")
+        time.sleep(seconds)
 
 
 @app.command()
@@ -140,7 +176,7 @@ def freshness(
     if max_age_hours is not None and age > max_age_hours:
         typer.echo(f"  STALE: older than {max_age_hours} h", err=True)
         bad = True
-    raise typer.Exit(2 if bad else 0)
+    raise typer.Exit(EXIT_STALE_SOURCE if bad else 0)
 
 
 @app.command()

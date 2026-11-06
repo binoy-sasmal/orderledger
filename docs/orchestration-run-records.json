@@ -1,0 +1,934 @@
+{
+ "airflow_version": "3.4.0",
+ "dags": {
+  "orderledger_replay": [
+   {
+    "dag_run_id": "scheduled__2026-11-06T22:56:00+00:00",
+    "state": "success",
+    "run_type": "scheduled",
+    "logical_date": "2026-11-06T22:56:00Z",
+    "data_interval_start": "2026-11-06T22:56:00Z",
+    "data_interval_end": "2026-11-06T22:56:00Z",
+    "start_date": "2026-11-06T23:04:23.149033Z",
+    "end_date": "2026-11-06T23:05:00.110888Z",
+    "triggered_by": "timetable",
+    "conf": {},
+    "tasks": [
+     {
+      "task_id": "check_freshness",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:04:59.085612Z",
+      "end_date": "2026-11-06T23:04:59.465060Z",
+      "duration": 0.379448,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:04:59.085612Z",
+        "end_date": "2026-11-06T23:04:59.465060Z"
+       }
+      ]
+     },
+     {
+      "task_id": "ensure_events",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:04:23.449485Z",
+      "end_date": "2026-11-06T23:04:29.329005Z",
+      "duration": 5.87952,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:04:23.449485Z",
+        "end_date": "2026-11-06T23:04:29.329005Z"
+       }
+      ]
+     },
+     {
+      "task_id": "plan",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:04:30.528200Z",
+      "end_date": "2026-11-06T23:04:30.687393Z",
+      "duration": 0.159193,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:04:30.528200Z",
+        "end_date": "2026-11-06T23:04:30.687393Z"
+       }
+      ]
+     },
+     {
+      "task_id": "run_batch",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:04:32.215953Z",
+      "end_date": "2026-11-06T23:04:48.324707Z",
+      "duration": 16.108754,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:04:32.215953Z",
+        "end_date": "2026-11-06T23:04:48.324707Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "scheduled__2026-11-06T22:59:00+00:00",
+    "state": "success",
+    "run_type": "scheduled",
+    "logical_date": "2026-11-06T22:59:00Z",
+    "data_interval_start": "2026-11-06T22:59:00Z",
+    "data_interval_end": "2026-11-06T22:59:00Z",
+    "start_date": "2026-11-06T23:04:23.270873Z",
+    "end_date": "2026-11-06T23:05:55.031565Z",
+    "triggered_by": "timetable",
+    "conf": {},
+    "tasks": [
+     {
+      "task_id": "check_freshness",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:05:54.074130Z",
+      "end_date": "2026-11-06T23:05:54.413954Z",
+      "duration": 0.339824,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:05:54.074130Z",
+        "end_date": "2026-11-06T23:05:54.413954Z"
+       }
+      ]
+     },
+     {
+      "task_id": "ensure_events",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:04:30.522723Z",
+      "end_date": "2026-11-06T23:04:30.654355Z",
+      "duration": 0.131632,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:04:30.522723Z",
+        "end_date": "2026-11-06T23:04:30.654355Z"
+       }
+      ]
+     },
+     {
+      "task_id": "plan",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:04:31.728744Z",
+      "end_date": "2026-11-06T23:04:31.889399Z",
+      "duration": 0.160655,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:04:31.728744Z",
+        "end_date": "2026-11-06T23:04:31.889399Z"
+       }
+      ]
+     },
+     {
+      "task_id": "run_batch",
+      "state": "success",
+      "try_number": 2,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:05:14.302600Z",
+      "end_date": "2026-11-06T23:05:24.850626Z",
+      "duration": 10.548026,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "failed",
+        "start_date": "2026-11-06T23:04:48.915900Z",
+        "end_date": "2026-11-06T23:04:58.720645Z"
+       },
+       {
+        "try_number": 2,
+        "state": "success",
+        "start_date": "2026-11-06T23:05:14.302600Z",
+        "end_date": "2026-11-06T23:05:24.850626Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "scheduled__2026-11-06T23:02:00+00:00",
+    "state": "success",
+    "run_type": "scheduled",
+    "logical_date": "2026-11-06T23:02:00Z",
+    "data_interval_start": "2026-11-06T23:02:00Z",
+    "data_interval_end": "2026-11-06T23:02:00Z",
+    "start_date": "2026-11-06T23:04:24.369018Z",
+    "end_date": "2026-11-06T23:05:56.171577Z",
+    "triggered_by": "timetable",
+    "conf": {},
+    "tasks": [
+     {
+      "task_id": "check_freshness",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:05:55.195866Z",
+      "end_date": "2026-11-06T23:05:55.498855Z",
+      "duration": 0.302989,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:05:55.195866Z",
+        "end_date": "2026-11-06T23:05:55.498855Z"
+       }
+      ]
+     },
+     {
+      "task_id": "ensure_events",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:04:31.780350Z",
+      "end_date": "2026-11-06T23:04:31.929643Z",
+      "duration": 0.149293,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:04:31.780350Z",
+        "end_date": "2026-11-06T23:04:31.929643Z"
+       }
+      ]
+     },
+     {
+      "task_id": "plan",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:04:32.215699Z",
+      "end_date": "2026-11-06T23:04:32.378985Z",
+      "duration": 0.163286,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:04:32.215699Z",
+        "end_date": "2026-11-06T23:04:32.378985Z"
+       }
+      ]
+     },
+     {
+      "task_id": "run_batch",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:05:25.604317Z",
+      "end_date": "2026-11-06T23:05:39.172877Z",
+      "duration": 13.56856,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:05:25.604317Z",
+        "end_date": "2026-11-06T23:05:39.172877Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "scheduled__2026-11-06T23:05:00+00:00",
+    "state": "success",
+    "run_type": "scheduled",
+    "logical_date": "2026-11-06T23:05:00Z",
+    "data_interval_start": "2026-11-06T23:05:00Z",
+    "data_interval_end": "2026-11-06T23:05:00Z",
+    "start_date": "2026-11-06T23:07:28.018933Z",
+    "end_date": "2026-11-06T23:07:43.272410Z",
+    "triggered_by": "timetable",
+    "conf": {},
+    "tasks": [
+     {
+      "task_id": "check_freshness",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:07:42.373461Z",
+      "end_date": "2026-11-06T23:07:42.764631Z",
+      "duration": 0.39117,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 0,
+        "state": "upstream_failed",
+        "start_date": "2026-11-06T23:05:53.811210Z",
+        "end_date": "2026-11-06T23:05:53.811210Z"
+       },
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:07:42.373461Z",
+        "end_date": "2026-11-06T23:07:42.764631Z"
+       }
+      ]
+     },
+     {
+      "task_id": "ensure_events",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:05:00.263901Z",
+      "end_date": "2026-11-06T23:05:00.372189Z",
+      "duration": 0.108288,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:05:00.263901Z",
+        "end_date": "2026-11-06T23:05:00.372189Z"
+       }
+      ]
+     },
+     {
+      "task_id": "plan",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:05:01.391471Z",
+      "end_date": "2026-11-06T23:05:01.515144Z",
+      "duration": 0.123673,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:05:01.391471Z",
+        "end_date": "2026-11-06T23:05:01.515144Z"
+       }
+      ]
+     },
+     {
+      "task_id": "run_batch",
+      "state": "success",
+      "try_number": 2,
+      "max_tries": 3,
+      "start_date": "2026-11-06T23:07:28.218222Z",
+      "end_date": "2026-11-06T23:07:41.201347Z",
+      "duration": 12.983125,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "failed",
+        "start_date": "2026-11-06T23:05:39.895524Z",
+        "end_date": "2026-11-06T23:05:53.245298Z"
+       },
+       {
+        "try_number": 2,
+        "state": "success",
+        "start_date": "2026-11-06T23:07:28.218222Z",
+        "end_date": "2026-11-06T23:07:41.201347Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "scheduled__2026-11-06T23:08:00+00:00",
+    "state": "success",
+    "run_type": "scheduled",
+    "logical_date": "2026-11-06T23:08:00Z",
+    "data_interval_start": "2026-11-06T23:08:00Z",
+    "data_interval_end": "2026-11-06T23:08:00Z",
+    "start_date": "2026-11-06T23:08:00.284192Z",
+    "end_date": "2026-11-06T23:08:16.630553Z",
+    "triggered_by": "timetable",
+    "conf": {},
+    "tasks": [
+     {
+      "task_id": "check_freshness",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:08:15.711013Z",
+      "end_date": "2026-11-06T23:08:16.069216Z",
+      "duration": 0.358203,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:08:15.711013Z",
+        "end_date": "2026-11-06T23:08:16.069216Z"
+       }
+      ]
+     },
+     {
+      "task_id": "ensure_events",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:08:00.478809Z",
+      "end_date": "2026-11-06T23:08:00.600003Z",
+      "duration": 0.121194,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:08:00.478809Z",
+        "end_date": "2026-11-06T23:08:00.600003Z"
+       }
+      ]
+     },
+     {
+      "task_id": "plan",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:08:01.575003Z",
+      "end_date": "2026-11-06T23:08:01.727364Z",
+      "duration": 0.152361,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:08:01.575003Z",
+        "end_date": "2026-11-06T23:08:01.727364Z"
+       }
+      ]
+     },
+     {
+      "task_id": "run_batch",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:08:02.286410Z",
+      "end_date": "2026-11-06T23:08:14.542434Z",
+      "duration": 12.256024,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:08:02.286410Z",
+        "end_date": "2026-11-06T23:08:14.542434Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "scheduled__2026-11-06T23:11:00+00:00",
+    "state": "success",
+    "run_type": "scheduled",
+    "logical_date": "2026-11-06T23:11:00Z",
+    "data_interval_start": "2026-11-06T23:11:00Z",
+    "data_interval_end": "2026-11-06T23:11:00Z",
+    "start_date": "2026-11-06T23:11:01.016887Z",
+    "end_date": "2026-11-06T23:11:17.092389Z",
+    "triggered_by": "timetable",
+    "conf": {},
+    "tasks": [
+     {
+      "task_id": "check_freshness",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:11:16.497585Z",
+      "end_date": "2026-11-06T23:11:16.874374Z",
+      "duration": 0.376789,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:11:16.497585Z",
+        "end_date": "2026-11-06T23:11:16.874374Z"
+       }
+      ]
+     },
+     {
+      "task_id": "ensure_events",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:11:01.361003Z",
+      "end_date": "2026-11-06T23:11:01.511255Z",
+      "duration": 0.150252,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:11:01.361003Z",
+        "end_date": "2026-11-06T23:11:01.511255Z"
+       }
+      ]
+     },
+     {
+      "task_id": "plan",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:11:02.186972Z",
+      "end_date": "2026-11-06T23:11:02.357674Z",
+      "duration": 0.170702,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:11:02.186972Z",
+        "end_date": "2026-11-06T23:11:02.357674Z"
+       }
+      ]
+     },
+     {
+      "task_id": "run_batch",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:11:02.817030Z",
+      "end_date": "2026-11-06T23:11:15.755353Z",
+      "duration": 12.938323,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:11:02.817030Z",
+        "end_date": "2026-11-06T23:11:15.755353Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "scheduled__2026-11-06T23:14:00+00:00",
+    "state": "success",
+    "run_type": "scheduled",
+    "logical_date": "2026-11-06T23:14:00Z",
+    "data_interval_start": "2026-11-06T23:14:00Z",
+    "data_interval_end": "2026-11-06T23:14:00Z",
+    "start_date": "2026-11-06T23:14:47.749314Z",
+    "end_date": "2026-11-06T23:15:01.544877Z",
+    "triggered_by": "timetable",
+    "conf": {},
+    "tasks": [
+     {
+      "task_id": "check_freshness",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:15:00.541916Z",
+      "end_date": "2026-11-06T23:15:00.957688Z",
+      "duration": 0.415772,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 0,
+        "state": "upstream_failed",
+        "start_date": "2026-11-06T23:14:16.506586Z",
+        "end_date": "2026-11-06T23:14:16.506586Z"
+       },
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:15:00.541916Z",
+        "end_date": "2026-11-06T23:15:00.957688Z"
+       }
+      ]
+     },
+     {
+      "task_id": "ensure_events",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:14:00.981588Z",
+      "end_date": "2026-11-06T23:14:01.114721Z",
+      "duration": 0.133133,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:14:00.981588Z",
+        "end_date": "2026-11-06T23:14:01.114721Z"
+       }
+      ]
+     },
+     {
+      "task_id": "plan",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:14:02.110724Z",
+      "end_date": "2026-11-06T23:14:02.352975Z",
+      "duration": 0.242251,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:14:02.110724Z",
+        "end_date": "2026-11-06T23:14:02.352975Z"
+       }
+      ]
+     },
+     {
+      "task_id": "run_batch",
+      "state": "success",
+      "try_number": 2,
+      "max_tries": 3,
+      "start_date": "2026-11-06T23:14:47.899746Z",
+      "end_date": "2026-11-06T23:14:59.570846Z",
+      "duration": 11.6711,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "failed",
+        "start_date": "2026-11-06T23:14:02.655723Z",
+        "end_date": "2026-11-06T23:14:16.330024Z"
+       },
+       {
+        "try_number": 2,
+        "state": "success",
+        "start_date": "2026-11-06T23:14:47.899746Z",
+        "end_date": "2026-11-06T23:14:59.570846Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "scheduled__2026-11-06T23:17:00+00:00",
+    "state": "success",
+    "run_type": "scheduled",
+    "logical_date": "2026-11-06T23:17:00Z",
+    "data_interval_start": "2026-11-06T23:17:00Z",
+    "data_interval_end": "2026-11-06T23:17:00Z",
+    "start_date": "2026-11-06T23:17:00.376264Z",
+    "end_date": "2026-11-06T23:17:03.091662Z",
+    "triggered_by": "timetable",
+    "conf": {},
+    "tasks": [
+     {
+      "task_id": "check_freshness",
+      "state": "skipped",
+      "try_number": 0,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:17:02.554316Z",
+      "end_date": "2026-11-06T23:17:02.554316Z",
+      "duration": 0.0,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 0,
+        "state": "skipped",
+        "start_date": "2026-11-06T23:17:02.554316Z",
+        "end_date": "2026-11-06T23:17:02.554316Z"
+       }
+      ]
+     },
+     {
+      "task_id": "ensure_events",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:17:00.562187Z",
+      "end_date": "2026-11-06T23:17:00.740230Z",
+      "duration": 0.178043,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:17:00.562187Z",
+        "end_date": "2026-11-06T23:17:00.740230Z"
+       }
+      ]
+     },
+     {
+      "task_id": "plan",
+      "state": "skipped",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:17:01.661383Z",
+      "end_date": "2026-11-06T23:17:01.889521Z",
+      "duration": 0.228138,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "skipped",
+        "start_date": "2026-11-06T23:17:01.661383Z",
+        "end_date": "2026-11-06T23:17:01.889521Z"
+       }
+      ]
+     },
+     {
+      "task_id": "run_batch",
+      "state": "skipped",
+      "try_number": 0,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:17:02.558062Z",
+      "end_date": "2026-11-06T23:17:02.558062Z",
+      "duration": 0.0,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 0,
+        "state": "skipped",
+        "start_date": "2026-11-06T23:17:02.558062Z",
+        "end_date": "2026-11-06T23:17:02.558062Z"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "orderledger_backfill": [
+   {
+    "dag_run_id": "bf-invalid-params",
+    "state": "failed",
+    "run_type": "manual",
+    "logical_date": null,
+    "data_interval_start": null,
+    "data_interval_end": null,
+    "start_date": "2026-11-06T23:06:15.122079Z",
+    "end_date": "2026-11-06T23:06:17.413783Z",
+    "triggered_by": "cli",
+    "conf": {
+     "date_from": "2018-01-30"
+    },
+    "tasks": [
+     {
+      "task_id": "repair",
+      "state": "upstream_failed",
+      "try_number": 0,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:06:16.303262Z",
+      "end_date": "2026-11-06T23:06:16.303262Z",
+      "duration": 0.0,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 0,
+        "state": "upstream_failed",
+        "start_date": "2026-11-06T23:06:16.303262Z",
+        "end_date": "2026-11-06T23:06:16.303262Z"
+       }
+      ]
+     },
+     {
+      "task_id": "validate",
+      "state": "failed",
+      "try_number": 1,
+      "max_tries": 0,
+      "start_date": "2026-11-06T23:06:15.367383Z",
+      "end_date": "2026-11-06T23:06:15.504370Z",
+      "duration": 0.136987,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "failed",
+        "start_date": "2026-11-06T23:06:15.367383Z",
+        "end_date": "2026-11-06T23:06:15.504370Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "bf-auto-repair",
+    "state": "success",
+    "run_type": "manual",
+    "logical_date": null,
+    "data_interval_start": null,
+    "data_interval_end": null,
+    "start_date": "2026-11-06T23:06:29.201455Z",
+    "end_date": "2026-11-06T23:07:14.786845Z",
+    "triggered_by": "cli",
+    "conf": {
+     "auto": true
+    },
+    "tasks": [
+     {
+      "task_id": "repair",
+      "state": "success",
+      "try_number": 3,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:07:02.258023Z",
+      "end_date": "2026-11-06T23:07:14.474586Z",
+      "duration": 12.216563,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "failed",
+        "start_date": "2026-11-06T23:06:30.502468Z",
+        "end_date": "2026-11-06T23:06:30.829156Z"
+       },
+       {
+        "try_number": 2,
+        "state": "failed",
+        "start_date": "2026-11-06T23:06:46.676935Z",
+        "end_date": "2026-11-06T23:06:46.950286Z"
+       },
+       {
+        "try_number": 3,
+        "state": "success",
+        "start_date": "2026-11-06T23:07:02.258023Z",
+        "end_date": "2026-11-06T23:07:14.474586Z"
+       }
+      ]
+     },
+     {
+      "task_id": "validate",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 0,
+      "start_date": "2026-11-06T23:06:29.390133Z",
+      "end_date": "2026-11-06T23:06:29.554097Z",
+      "duration": 0.163964,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:06:29.390133Z",
+        "end_date": "2026-11-06T23:06:29.554097Z"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "dag_run_id": "bf-explicit-repair",
+    "state": "success",
+    "run_type": "manual",
+    "logical_date": null,
+    "data_interval_start": null,
+    "data_interval_end": null,
+    "start_date": "2026-11-06T23:14:25.517739Z",
+    "end_date": "2026-11-06T23:14:40.188487Z",
+    "triggered_by": "cli",
+    "conf": {
+     "date_to": "2018-03-07",
+     "date_from": "2018-03-07"
+    },
+    "tasks": [
+     {
+      "task_id": "repair",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 2,
+      "start_date": "2026-11-06T23:14:26.860101Z",
+      "end_date": "2026-11-06T23:14:39.312620Z",
+      "duration": 12.452519,
+      "pool": "orderledger_warehouse",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:14:26.860101Z",
+        "end_date": "2026-11-06T23:14:39.312620Z"
+       }
+      ]
+     },
+     {
+      "task_id": "validate",
+      "state": "success",
+      "try_number": 1,
+      "max_tries": 0,
+      "start_date": "2026-11-06T23:14:25.749068Z",
+      "end_date": "2026-11-06T23:14:26.082536Z",
+      "duration": 0.333468,
+      "pool": "default_pool",
+      "operator": "_PythonDecoratedOperator",
+      "attempts": [
+       {
+        "try_number": 1,
+        "state": "success",
+        "start_date": "2026-11-06T23:14:25.749068Z",
+        "end_date": "2026-11-06T23:14:26.082536Z"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

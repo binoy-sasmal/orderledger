@@ -25,11 +25,25 @@ logical event content.
 | AT-12 | Headline metrics equal two independent computations | `test_reference.py` (direct SQL over the CSVs without synthetic events; plain-Python reference with them) |
 | AT-13 | Same input and scenario give the same logical events; every synthetic event is labelled | `test_events.py` |
 
+## Orchestration checks (added with the Airflow stage)
+
+| Check | Where |
+|---|---|
+| Interval to batch mapping is positional, wall-clock independent, and robust to Airflow's datetime type | `test_orchestration.py` |
+| Backfill parameters validated (both modes, bad dates, reversed, too wide) | `test_orchestration.py` |
+| Exit codes: 75 retryable, 1 deterministic; once-only injected failure then success with no duplicated results | `test_orchestration.py` |
+| Second writer rejected / waits; overlapping real runs serialized to the same result | `test_orchestration.py` |
+| DAGs import and keep their pool, retry policy, ordering and parameters | `airflow/check_dags.py` (in the Airflow image) |
+| End-to-end scheduling, retry, deterministic failure, backfill, lock collision, equality with a replay | `airflow/demo.py` (23 checks; needs Docker) |
+
+CI runs the pytest suite only. `check_dags.py` and `demo.py` need Docker and the 3 GB Airflow image
+and are run locally; they are not part of the GitHub Actions workflow.
+
 ## Known limits of these tests
 
 * The Python reference and the warehouse share an author and the written rules, so the reference
   is a cross-check, not independent verification. The CSV-direct check (no events involved) is
   the more independent one, and only covers runs without synthetic events.
-* Freshness is covered by CLI exit codes. There is no scheduler yet that would act on them
-  (planned in the Airflow stage).
+* Freshness is covered by CLI exit codes. The Airflow demo runs the freshness check after each
+  batch and shows it skipped when the batch failed; it does not alert anyone.
 * Fixture-scale tests do not exercise performance; runtime is measured separately.

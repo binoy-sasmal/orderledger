@@ -16,3 +16,5 @@ logs/
 .env
 *.egg-info/
 dbt/.user.yml
+airflow/.env
+airflow/logs/

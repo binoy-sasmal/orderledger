@@ -12,7 +12,7 @@ page states what the finished work does and does not evidence, per gap.
 | Incremental processing, idempotent reruns, backfills | Watermark, lookback, recompute-by-key, targeted backfill, crash-and-retry, equivalence of incremental and full replay on 99k orders (0 differing rows) | Streaming, true CDC |
 | Data quality and monitoring | dbt tests, source-inventory and fact/metric reconciliation gating publication, run log, separate source and execution freshness | A monitoring or alerting system |
 | CI/CD | GitHub Actions: lint and the full test suite on every push (passed) | Deployment pipelines |
-| Orchestration (Airflow, Dagster) | **Not closed.** Scheduling is a CLI and a demo script | An Airflow DAG with retries and backfills (not built) |
+| Orchestration (Airflow, Dagster) | **Partly closed.** Airflow 3.4.0 (local, Docker): scheduled replay DAG with interval-to-batch mapping, retries that distinguish retryable from deterministic failures, a parameterised backfill DAG, a single-writer pool plus file lock. Verified on the synthetic fixture ([orchestration-evidence.md](orchestration-evidence.md)) | Production or managed orchestration (MWAA, Astronomer, Kubernetes), Celery or Kubernetes executors, sensors and deferrable operators, alerting and SLAs, Dagster. Not run on the full Olist data |
 | Cloud warehouse / lakehouse platform (Databricks, Snowflake, BigQuery, Fabric) | **Not closed.** Local DuckDB only; guarantees for other platforms are documented as unverified | Any platform run |
 | Spark / PySpark | **Not closed** | |
 | Streaming (Kafka, Flink) | **Not closed** | |

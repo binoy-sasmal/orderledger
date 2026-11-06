@@ -102,9 +102,16 @@ No cost saving or scale claim is made.
 
 ## Platform execution
 
-None. The code runs on local DuckDB only. The Databricks Free Edition stage and the Airflow
-wrapper were not built, so neither the cloud-platform gap nor the orchestration gap is closed
-by this project. See [gap-mapping.md](gap-mapping.md).
+None. The full-data results above come from local DuckDB runs driven by the CLI. No cloud
+platform (Databricks or otherwise) was used, so the cloud-platform gap is not closed.
+
+## Orchestration (separate evidence, synthetic fixture only)
+
+Airflow 3.4.0 orchestration was added afterwards and verified on the **synthetic CI fixture**, not
+on the Olist data: scheduled runs, an automatic retry of an injected transient failure,
+deterministic failures that are not retried, Airflow-triggered targeted backfills, and
+serialization of overlapping writers. See [orchestration-evidence.md](orchestration-evidence.md).
+The full-data results in this report were not produced under Airflow.
 
 ## Limitations
 

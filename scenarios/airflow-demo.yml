@@ -1,0 +1,11 @@
+# Scenario for the Airflow demo on the synthetic CI fixture: the CI perturbations with
+# fortnightly batches (7 replay batches). All perturbations are SYNTHETIC.
+seed: 7
+batch_days: 14
+duplicates: {rate: 0.05, delay_days: 2}
+late_inside: {count: 3, delay_days: 4}
+late_outside: {count: 2, delay_days: 25}
+price_corrections: {count: 4, delay_days: 3}
+delivery_corrections: {count: 2, shift_days: 2, delay_days: 25}
+deletions: {count: 2, delay_days: 5}
+out_of_order: {count: 2, original_delay_days: 10}

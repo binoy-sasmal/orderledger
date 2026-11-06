@@ -43,3 +43,23 @@ key from full history (no deltas are ever added), so it is idempotent.
 lookback is anchored to it, never to the wall clock, so results are reproducible. Real time is
 used only for `published_at` and execution freshness.
 See [late-data.md](late-data.md) for what the lookback does and does not guard against.
+
+## Orchestration (Airflow, local)
+
+Airflow 3.4.0 coordinates the same CLI; it adds scheduling, retries and visibility, not logic.
+Details, scope and limits: [orchestration.md](orchestration.md). Recorded runs (synthetic fixture):
+[orchestration-evidence.md](orchestration-evidence.md).
+
+```mermaid
+flowchart LR
+  S[Scheduler<br/>one interval per replay batch] --> E[ensure_events]
+  E --> P[plan<br/>interval to batch k+1]
+  P --> R[run_batch<br/>orderledger run --through k+1]
+  R --> F[check_freshness]
+  R -. exit 75 retryable .-> R
+  R -. exit 1 deterministic .-> X[failed, NOT retried<br/>published and watermark preserved]
+  X --> B[orderledger_backfill<br/>manual, validated parameters]
+  B --> R
+  POOL[(pool: 1 slot)] -.-> E & R & F & B
+  LOCK[(workspace file lock)] -.-> R & B
+```
