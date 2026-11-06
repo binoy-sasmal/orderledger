@@ -1,0 +1,11 @@
+# Scenario for the full Olist run. ALL perturbations are SYNTHETIC; counts are sized to the
+# ~99k orders and chosen to exercise every rule, not to resemble real-world rates.
+seed: 7
+batch_days: 14
+duplicates: {rate: 0.01, delay_days: 2}
+late_inside: {count: 300, delay_days: 4}
+late_outside: {count: 150, delay_days: 25}
+price_corrections: {count: 400, delay_days: 3}
+delivery_corrections: {count: 200, shift_days: 2, delay_days: 25}
+deletions: {count: 100, delay_days: 5}
+out_of_order: {count: 60, original_delay_days: 10}

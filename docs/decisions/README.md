@@ -28,8 +28,10 @@ version, quarantine the batch and fail the run. Silent deduplication would hide 
 
 ## ADR-003: Customer dimension is Type 1; no SCD Type 2 unless the data earns it
 
-**Decision (provisional until the source profile is recorded in `docs/source-profile.md`).**
+**Decision (confirmed by the measured profile, `docs/source-profile.md`).**
 `dim_customer` is Type 1 on `customer_unique_id`. No SCD2 is built on addresses.
+**Measured:** 96,096 people; 2,997 (3.1%) have more than one order; 122 (0.13%) were observed
+at more than one city/state and 39 in more than one state. Too few, and the address is order-level.
 **Why.** In Olist, `customer_id` is created per order, so an address is *the address observed on
 that order*, not verified residence history. Whether any person was observed at more than one
 location is a measured fact, not an assumption; it is recorded in the profile. A history table

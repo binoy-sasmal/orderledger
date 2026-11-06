@@ -82,3 +82,61 @@ def reference_metrics(events_dir: Path, through_batch: int | None = None) -> dic
         if est is not None and deliv[:10] <= est[:10]:
             on_time[deliv[:10]] += 1
     return {"orders": dict(orders), "gmv": dict(gmv), "delivered": dict(delivered), "on_time": dict(on_time)}
+
+
+def csv_metrics(csv_dir: Path) -> dict:
+    """Headline metrics computed directly from the source CSVs (no events involved).
+    Valid only for runs without synthetic events."""
+    con = duckdb.connect()
+    o = f"read_csv('{(csv_dir / 'olist_orders_dataset.csv').as_posix()}', header=true)"
+    i = f"read_csv('{(csv_dir / 'olist_order_items_dataset.csv').as_posix()}', header=true)"
+    orders = dict(
+        con.execute(f"select cast(order_purchase_timestamp as date)::varchar, count(*) from {o} group by 1").fetchall()
+    )
+    gmv = {
+        k: Decimal(str(v)).quantize(CENT)
+        for k, v in con.execute(
+            f"select cast(o.order_purchase_timestamp as date)::varchar, sum(i.price) "
+            f"from {o} o join {i} i using (order_id) group by 1"
+        ).fetchall()
+    }
+    d = con.execute(
+        f"""
+        select cast(order_delivered_customer_date as date)::varchar, count(*),
+               count(*) filter (where order_estimated_delivery_date is not null
+                 and cast(order_delivered_customer_date as date) <= cast(order_estimated_delivery_date as date))
+        from {o}
+        where order_delivered_customer_date is not null
+          and (order_approved_at is null or order_approved_at >= order_purchase_timestamp)
+          and (order_delivered_carrier_date is null or (order_delivered_carrier_date >= order_purchase_timestamp
+               and (order_approved_at is null or order_delivered_carrier_date >= order_approved_at)))
+          and order_delivered_customer_date >= order_purchase_timestamp
+          and (order_approved_at is null or order_delivered_customer_date >= order_approved_at)
+          and (order_delivered_carrier_date is null or order_delivered_customer_date >= order_delivered_carrier_date)
+        group by 1"""
+    ).fetchall()
+    return {
+        "orders": orders,
+        "gmv": gmv,
+        "delivered": {k: n for k, n, _ in d},
+        "on_time": {k: m for k, _, m in d if m},
+    }
+
+
+def published_metrics(db_file: Path) -> dict:
+    con = duckdb.connect(str(db_file), read_only=True)
+    try:
+        p = con.execute(
+            "select purchase_date::varchar, orders_placed, gmv from published.agg_daily_purchases"
+        ).fetchall()
+        d = con.execute(
+            "select delivered_date::varchar, delivered_orders, on_time_orders from published.agg_daily_deliveries"
+        ).fetchall()
+    finally:
+        con.close()
+    return {
+        "orders": {k: n for k, n, _ in p},
+        "gmv": {k: Decimal(g) for k, _, g in p if g},
+        "delivered": {k: n for k, n, _ in d if n},
+        "on_time": {k: m for k, _, m in d if m},
+    }

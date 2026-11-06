@@ -1,0 +1,114 @@
+== 1. Build the replayable change history (synthetic events are labelled as such)
+
+$ orderledger simulate tests\fixtures\synth --scenario warehouse\demo-scenario.yml --ws warehouse\demo
+wrote 7 batches, 508 events to warehouse\demo\events
+(exit code 0)
+
+== 2. Normal incremental runs
+
+$ orderledger run --ws warehouse\demo --through 1
+run 9ada9735168b success: checkpoint=2018-01-14 batches_loaded=1 rows_loaded=54 watermark 0->54 in 13.422s
+  [skipped] source_inventory: partial history: expected counts only decidable once all batches loaded
+  [ok     ] raw_to_fct_orders: placed orders in events=9, fct_orders=9
+  [ok     ] raw_to_fct_order_items: items/price in events=(14, 1721.94), fct_order_items=(14, 1721.94)
+  [warn   ] orphans: orders without order_placed=0, items without a placed order=1 (waiting for late data; not published until the order arrives)
+  [ok     ] facts_to_marts: incremental aggregates equal a full recomputation
+  [ok     ] data_quality_notes: canceled orders carrying a delivery time=0; orders with inconsistent timestamp order (excluded from delivery metrics)=0
+(exit code 0)
+
+$ orderledger run --ws warehouse\demo --through 2
+run 1280565af26d success: checkpoint=2018-01-28 batches_loaded=1 rows_loaded=124 watermark 54->178 in 13.735s
+  [skipped] source_inventory: partial history: expected counts only decidable once all batches loaded
+  [ok     ] raw_to_fct_orders: placed orders in events=31, fct_orders=31
+  [ok     ] raw_to_fct_order_items: items/price in events=(57, 9167.76), fct_order_items=(57, 9167.76)
+  [warn   ] orphans: orders without order_placed=0, items without a placed order=3 (waiting for late data; not published until the order arrives)
+  [ok     ] facts_to_marts: incremental aggregates equal a full recomputation
+  [ok     ] data_quality_notes: canceled orders carrying a delivery time=0; orders with inconsistent timestamp order (excluded from delivery metrics)=1
+(exit code 0)
+
+== 3. A crash after the aggregates are built: nothing is published, the retry is correct
+
+$ orderledger run --ws warehouse\demo --through 3 --fail-after marts
+FAILED [marts] injected failure (simulated crash)
+(exit code 1)
+
+$ orderledger status --ws warehouse\demo
+published: watermark=178 checkpoint=2018-01-28 run=1280565af26d at=2026-11-06 12:52:09.951008
+  run a150ae1e41c6 | run | failed | marts | 2018-02-11 | 9.8 | injected failure (simulated crash)
+  run 1280565af26d | run | success | None | 2018-01-28 | 13.7 | 
+  run 9ada9735168b | run | success | None | 2018-01-14 | 13.4 |
+(exit code 0)
+
+$ orderledger run --ws warehouse\demo --through 3
+run b5cf3a597bed success: checkpoint=2018-02-11 batches_loaded=0 rows_loaded=0 watermark 178->299 in 12.172s
+  [skipped] source_inventory: partial history: expected counts only decidable once all batches loaded
+  [ok     ] raw_to_fct_orders: placed orders in events=47, fct_orders=47
+  [ok     ] raw_to_fct_order_items: items/price in events=(94, 14628.62), fct_order_items=(94, 14628.62)
+  [warn   ] orphans: orders without order_placed=0, items without a placed order=1 (waiting for late data; not published until the order arrives)
+  [ok     ] facts_to_marts: incremental aggregates equal a full recomputation
+  [ok     ] data_quality_notes: canceled orders carrying a delivery time=0; orders with inconsistent timestamp order (excluded from delivery metrics)=1
+(exit code 0)
+
+== 4. Keep going until a late correction lands outside the lookback
+
+$ orderledger run --ws warehouse\demo --through 4
+FAILED [recon] facts_to_marts: stale aggregate dates: purchases=[] deliveries=['2018-01-30']. Fix with: orderledger backfill --from 2018-01-30 --to 2018-01-30
+(exit code 1)  <- reconciliation refused to publish
+
+== 5. Targeted backfill of exactly the dates reconciliation named, then reconcile
+
+$ orderledger backfill --ws warehouse\demo --auto
+backfilling 2018-01-30 .. 2018-01-30
+run fda8d81d1fd5 success: checkpoint=2018-02-25 batches_loaded=0 rows_loaded=0 watermark 299->385 in 14.734s
+  [skipped] source_inventory: partial history: expected counts only decidable once all batches loaded
+  [ok     ] raw_to_fct_orders: placed orders in events=63, fct_orders=63
+  [ok     ] raw_to_fct_order_items: items/price in events=(118, 16961.71), fct_order_items=(118, 16961.71)
+  [ok     ] orphans: orders without order_placed=0, items without a placed order=0 (waiting for late data; not published until the order arrives)
+  [ok     ] facts_to_marts: incremental aggregates equal a full recomputation
+  [ok     ] data_quality_notes: canceled orders carrying a delivery time=0; orders with inconsistent timestamp order (excluded from delivery metrics)=2
+(exit code 0)
+
+== 6. Finish the remaining batches and check the final state
+batch 5: ok
+batch 6: ok
+batch 7: failed
+
+$ orderledger backfill --ws warehouse\demo --auto
+backfilling 2018-03-07 .. 2018-03-07
+run 3886af55bb30 success: checkpoint=2018-04-08 batches_loaded=0 rows_loaded=0 watermark 437->508 in 13.141s
+  [ok     ] source_inventory: every source event type matches the source CSVs
+  [ok     ] placed_orders_by_date: orders per purchase date match the source on 44 dates
+  [ok     ] raw_to_fct_orders: placed orders in events=70, fct_orders=70
+  [ok     ] raw_to_fct_order_items: items/price in events=(130, 18697.37), fct_order_items=(130, 18697.37)
+  [ok     ] orphans: orders without order_placed=0, items without a placed order=0 (waiting for late data; not published until the order arrives)
+  [ok     ] facts_to_marts: incremental aggregates equal a full recomputation
+  [ok     ] data_quality_notes: canceled orders carrying a delivery time=3; orders with inconsistent timestamp order (excluded from delivery metrics)=3
+(exit code 0)
+batch 8: ok
+
+$ orderledger reconcile --ws warehouse\demo
+[ok     ] source_inventory: every source event type matches the source CSVs
+[ok     ] placed_orders_by_date: orders per purchase date match the source on 44 dates
+[ok     ] raw_to_fct_orders: placed orders in events=70, fct_orders=70
+[ok     ] raw_to_fct_order_items: items/price in events=(130, 18697.37), fct_order_items=(130, 18697.37)
+[ok     ] orphans: orders without order_placed=0, items without a placed order=0 (waiting for late data; not published until the order arrives)
+[ok     ] facts_to_marts: incremental aggregates equal a full recomputation
+[ok     ] data_quality_notes: canceled orders carrying a delivery time=3; orders with inconsistent timestamp order (excluded from delivery metrics)=3
+(exit code 0)
+
+$ orderledger freshness --ws warehouse\demo
+source (simulated): published through 2018-04-08
+execution (real): last publish 0.00 h ago
+(exit code 0)
+
+$ orderledger status --ws warehouse\demo
+published: watermark=508 checkpoint=2018-04-08 run=8ce9bb0c9a03 at=2026-11-06 12:54:12.391818
+  run 8ce9bb0c9a03 | run | success | None | 2018-04-08 | 13.2 | 
+  run 3886af55bb30 | backfill | success | None | 2018-04-08 | 13.1 | 
+  run 233f4334bb42 | run | failed | recon | 2018-04-08 | 14.6 | facts_to_marts: stale aggregate dates: purchases=[] deliveries=['2018-03-07']. Fix with: orderledger
+  run 779816004d87 | run | success | None | 2018-03-25 | 13.6 | 
+  run d78e99424a74 | run | success | None | 2018-03-11 | 14.2 | 
+  run fda8d81d1fd5 | backfill | success | None | 2018-02-25 | 14.7 | 
+  run 9128b4de9b84 | run | failed | recon | 2018-02-25 | 13.5 | facts_to_marts: stale aggregate dates: purchases=[] deliveries=['2018-01-30']. Fix with: orderledger
+  run b5cf3a597bed | run | success | None | 2018-02-11 | 12.2 |
+(exit code 0)

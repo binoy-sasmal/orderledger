@@ -1,0 +1,590 @@
+{
+ "csv_dir": "data\\olist",
+ "incremental_14d": {
+  "batches": 56,
+  "events": 643721,
+  "simulate_seconds": 4.9,
+  "runs": [
+   14.5,
+   15.6,
+   15.5,
+   14.5,
+   14.3,
+   13.7,
+   14.6,
+   14.6,
+   14.3,
+   14.1,
+   14.0,
+   14.8,
+   28.6,
+   28.4,
+   14.5,
+   28.9,
+   31.7,
+   30.0,
+   30.9,
+   15.6,
+   29.8,
+   30.5,
+   30.8,
+   30.6,
+   31.0,
+   32.2,
+   29.8,
+   29.6,
+   27.8,
+   27.7,
+   14.0,
+   15.3,
+   29.6,
+   31.3,
+   31.1,
+   31.9,
+   30.7,
+   33.9,
+   33.4,
+   32.6,
+   34.3,
+   33.2,
+   33.9,
+   17.8,
+   36.5,
+   36.6,
+   35.1,
+   35.7,
+   37.2,
+   35.8,
+   38.4,
+   18.9,
+   37.0,
+   36.1,
+   17.9,
+   20.1
+  ],
+  "recon_failures": [
+   {
+    "batch": 13,
+    "window": [
+     "2017-02-06",
+     "2017-02-06"
+    ]
+   },
+   {
+    "batch": 14,
+    "window": [
+     "2017-02-09",
+     "2017-02-09"
+    ]
+   },
+   {
+    "batch": 16,
+    "window": [
+     "2017-03-13",
+     "2017-03-14"
+    ]
+   },
+   {
+    "batch": 17,
+    "window": [
+     "2017-03-27",
+     "2017-03-27"
+    ]
+   },
+   {
+    "batch": 18,
+    "window": [
+     "2017-04-09",
+     "2017-04-17"
+    ]
+   },
+   {
+    "batch": 19,
+    "window": [
+     "2017-04-19",
+     "2017-04-19"
+    ]
+   },
+   {
+    "batch": 21,
+    "window": [
+     "2017-05-17",
+     "2017-05-26"
+    ]
+   },
+   {
+    "batch": 22,
+    "window": [
+     "2017-05-31",
+     "2017-06-09"
+    ]
+   },
+   {
+    "batch": 23,
+    "window": [
+     "2017-06-22",
+     "2017-06-26"
+    ]
+   },
+   {
+    "batch": 24,
+    "window": [
+     "2017-07-04",
+     "2017-07-04"
+    ]
+   },
+   {
+    "batch": 25,
+    "window": [
+     "2017-07-17",
+     "2017-07-18"
+    ]
+   },
+   {
+    "batch": 26,
+    "window": [
+     "2017-07-31",
+     "2017-08-01"
+    ]
+   },
+   {
+    "batch": 27,
+    "window": [
+     "2017-08-08",
+     "2017-08-18"
+    ]
+   },
+   {
+    "batch": 28,
+    "window": [
+     "2017-08-21",
+     "2017-09-01"
+    ]
+   },
+   {
+    "batch": 29,
+    "window": [
+     "2017-09-08",
+     "2017-09-16"
+    ]
+   },
+   {
+    "batch": 30,
+    "window": [
+     "2017-09-19",
+     "2017-09-28"
+    ]
+   },
+   {
+    "batch": 33,
+    "window": [
+     "2017-10-30",
+     "2017-11-09"
+    ]
+   },
+   {
+    "batch": 34,
+    "window": [
+     "2017-11-14",
+     "2017-11-26"
+    ]
+   },
+   {
+    "batch": 35,
+    "window": [
+     "2017-11-30",
+     "2017-11-30"
+    ]
+   },
+   {
+    "batch": 36,
+    "window": [
+     "2017-12-21",
+     "2017-12-21"
+    ]
+   },
+   {
+    "batch": 37,
+    "window": [
+     "2017-12-30",
+     "2018-01-04"
+    ]
+   },
+   {
+    "batch": 38,
+    "window": [
+     "2018-01-16",
+     "2018-01-16"
+    ]
+   },
+   {
+    "batch": 39,
+    "window": [
+     "2018-01-22",
+     "2018-01-22"
+    ]
+   },
+   {
+    "batch": 40,
+    "window": [
+     "2018-02-09",
+     "2018-02-16"
+    ]
+   },
+   {
+    "batch": 41,
+    "window": [
+     "2018-02-24",
+     "2018-03-05"
+    ]
+   },
+   {
+    "batch": 42,
+    "window": [
+     "2018-03-05",
+     "2018-03-19"
+    ]
+   },
+   {
+    "batch": 43,
+    "window": [
+     "2018-03-18",
+     "2018-03-29"
+    ]
+   },
+   {
+    "batch": 45,
+    "window": [
+     "2018-04-16",
+     "2018-04-17"
+    ]
+   },
+   {
+    "batch": 46,
+    "window": [
+     "2018-04-30",
+     "2018-05-10"
+    ]
+   },
+   {
+    "batch": 47,
+    "window": [
+     "2018-05-14",
+     "2018-05-28"
+    ]
+   },
+   {
+    "batch": 48,
+    "window": [
+     "2018-05-29",
+     "2018-06-11"
+    ]
+   },
+   {
+    "batch": 49,
+    "window": [
+     "2018-06-12",
+     "2018-06-20"
+    ]
+   },
+   {
+    "batch": 50,
+    "window": [
+     "2018-06-26",
+     "2018-07-07"
+    ]
+   },
+   {
+    "batch": 51,
+    "window": [
+     "2018-07-10",
+     "2018-07-10"
+    ]
+   },
+   {
+    "batch": 53,
+    "window": [
+     "2018-08-13",
+     "2018-08-17"
+    ]
+   },
+   {
+    "batch": 54,
+    "window": [
+     "2018-08-22",
+     "2018-08-28"
+    ]
+   }
+  ],
+  "total_seconds": 1471.3,
+  "median_run_seconds": 29.8
+ },
+ "full_replay_14d": {
+  "batches": 56,
+  "events": 643721,
+  "simulate_seconds": 5.0,
+  "runs": [
+   27.1
+  ],
+  "recon_failures": [],
+  "total_seconds": 27.1,
+  "median_run_seconds": 27.1
+ },
+ "incremental_28d": {
+  "batches": 28,
+  "events": 643721,
+  "simulate_seconds": 4.5,
+  "runs": [
+   13.7,
+   13.7,
+   13.9,
+   14.0,
+   14.3,
+   15.4,
+   26.4,
+   27.2,
+   27.7,
+   27.8,
+   29.1,
+   29.7,
+   28.0,
+   30.7,
+   31.7,
+   15.8,
+   32.0,
+   32.0,
+   32.6,
+   33.5,
+   36.7,
+   34.8,
+   37.7,
+   39.5,
+   39.5,
+   39.6,
+   34.4,
+   24.4
+  ],
+  "recon_failures": [
+   {
+    "batch": 7,
+    "window": [
+     "2017-02-09",
+     "2017-02-09"
+    ]
+   },
+   {
+    "batch": 8,
+    "window": [
+     "2017-03-13",
+     "2017-03-14"
+    ]
+   },
+   {
+    "batch": 9,
+    "window": [
+     "2017-03-27",
+     "2017-04-09"
+    ]
+   },
+   {
+    "batch": 10,
+    "window": [
+     "2017-04-19",
+     "2017-04-19"
+    ]
+   },
+   {
+    "batch": 11,
+    "window": [
+     "2017-05-17",
+     "2017-05-31"
+    ]
+   },
+   {
+    "batch": 12,
+    "window": [
+     "2017-06-22",
+     "2017-07-04"
+    ]
+   },
+   {
+    "batch": 13,
+    "window": [
+     "2017-07-17",
+     "2017-07-18"
+    ]
+   },
+   {
+    "batch": 14,
+    "window": [
+     "2017-08-08",
+     "2017-08-21"
+    ]
+   },
+   {
+    "batch": 15,
+    "window": [
+     "2017-09-08",
+     "2017-09-19"
+    ]
+   },
+   {
+    "batch": 17,
+    "window": [
+     "2017-10-30",
+     "2017-11-14"
+    ]
+   },
+   {
+    "batch": 18,
+    "window": [
+     "2017-11-30",
+     "2017-11-30"
+    ]
+   },
+   {
+    "batch": 19,
+    "window": [
+     "2017-12-30",
+     "2018-01-04"
+    ]
+   },
+   {
+    "batch": 20,
+    "window": [
+     "2018-01-22",
+     "2018-02-09"
+    ]
+   },
+   {
+    "batch": 21,
+    "window": [
+     "2018-02-24",
+     "2018-03-09"
+    ]
+   },
+   {
+    "batch": 22,
+    "window": [
+     "2018-03-18",
+     "2018-03-29"
+    ]
+   },
+   {
+    "batch": 23,
+    "window": [
+     "2018-04-16",
+     "2018-05-07"
+    ]
+   },
+   {
+    "batch": 24,
+    "window": [
+     "2018-05-14",
+     "2018-05-29"
+    ]
+   },
+   {
+    "batch": 25,
+    "window": [
+     "2018-06-12",
+     "2018-06-30"
+    ]
+   },
+   {
+    "batch": 26,
+    "window": [
+     "2018-07-10",
+     "2018-07-10"
+    ]
+   },
+   {
+    "batch": 27,
+    "window": [
+     "2018-08-13",
+     "2018-08-27"
+    ]
+   }
+  ],
+  "total_seconds": 776.1,
+  "median_run_seconds": 29.4
+ },
+ "diff_incremental_vs_replay": {
+  "dim_date": 0,
+  "dim_customer": 0,
+  "dim_product": 0,
+  "fct_orders": 0,
+  "fct_order_items": 0,
+  "order_state_intervals": 0,
+  "agg_daily_purchases": 0,
+  "agg_daily_deliveries": 0
+ },
+ "diff_14d_vs_28d": {
+  "dim_date": 0,
+  "dim_customer": 0,
+  "dim_product": 0,
+  "fct_orders": 0,
+  "fct_order_items": 0,
+  "order_state_intervals": 0,
+  "agg_daily_purchases": 0,
+  "agg_daily_deliveries": 0
+ },
+ "raw_events_rows": 643721,
+ "raw_events_distinct": 638658,
+ "events_by_type": {
+  "order_approved": 100229,
+  "order_deleted": 101,
+  "order_delivered": 97641,
+  "order_handed_to_carrier": 98646,
+  "order_item_added": 113786,
+  "order_item_price_corrected": 463,
+  "order_placed": 100463,
+  "order_status_observed": 99441,
+  "product_observed": 32951
+ },
+ "synthetic_events_by_tag": {
+  "deletion": 100,
+  "delivery_correction": 200,
+  "duplicate_delivery": 5063,
+  "late_inside_lookback": 300,
+  "late_outside_lookback": 150,
+  "out_of_order": 120,
+  "price_correction": 400
+ },
+ "published_rows": {
+  "fct_orders": 99441,
+  "fct_order_items": 112650,
+  "order_state_intervals": 386947,
+  "dim_customer": 96001,
+  "dim_product": 32951,
+  "agg_daily_purchases": 634,
+  "agg_daily_deliveries": 646
+ },
+ "quality_notes": {
+  "orders_excluded_invalid_sequence": 1381,
+  "canceled_with_delivery_time": 6
+ },
+ "python_reference_matches": {
+  "orders": true,
+  "gmv": true,
+  "delivered": true,
+  "on_time": true
+ },
+ "clean_replay": {
+  "batches": 56,
+  "events": 637898,
+  "simulate_seconds": 5.1,
+  "runs": [
+   29.8
+  ],
+  "recon_failures": [],
+  "total_seconds": 29.8,
+  "median_run_seconds": 29.8
+ },
+ "direct_csv_matches": {
+  "orders": true,
+  "gmv": true,
+  "delivered": true,
+  "on_time": true
+ }
+}

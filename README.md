@@ -49,6 +49,12 @@ Olist CSVs -> simulate -> events/*.parquet + manifest -> load (validated, idempo
 * **Operational record.** Every run, including failures, is logged in `ctl.run_log`; freshness is
   reported separately for simulated source time and real execution time.
 
+**Result on the full Olist data** (99k orders, 643k events, 56 and 28 batches): incremental runs
+equal a single-pass replay with zero differing rows; reconciliation refused to publish and a
+targeted backfill repaired it whenever a late correction fell outside the lookback. See the
+[evidence report](docs/evidence-report.md), [gap mapping](docs/gap-mapping.md) and
+[demo transcript](docs/demo-transcript.txt). Not built: Airflow and any cloud-platform run.
+
 Documents: [metric definitions](docs/metrics.md), [data model](docs/data-model.md),
 [design decisions](docs/decisions/README.md), [guarantees per platform](docs/guarantees.md),
 [acceptance tests](docs/acceptance.md).
