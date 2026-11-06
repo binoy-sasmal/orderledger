@@ -1,0 +1,18 @@
+# Olist data (CC BY-NC-SA 4.0) and everything derived from it stay out of git
+data/
+warehouse/
+*.duckdb
+*.duckdb.wal
+*.parquet
+!tests/fixtures/**/*.parquet
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+dbt_target/
+dbt_logs/
+target/
+logs/
+.env
+*.egg-info/
+dbt/.user.yml

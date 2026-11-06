@@ -1,0 +1,8 @@
+orderledger:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('ORDERLEDGER_DB') }}"
+      schema: work
+      threads: 1

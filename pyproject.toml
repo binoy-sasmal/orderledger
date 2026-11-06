@@ -1,0 +1,38 @@
+[project]
+name = "orderledger"
+version = "0.1.0"
+description = "Incremental e-commerce analytics warehouse: replayable change events, DuckDB, dbt"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "dbt-core>=1.11,<1.12",
+    "dbt-duckdb",
+    "duckdb",
+    "pyyaml",
+    "typer",
+]
+
+[project.scripts]
+orderledger = "orderledger.cli:app"
+
+[dependency-groups]
+dev = ["pytest>=9.2.0", "ruff>=0.17.4", "types-pyyaml>=6.0.12.20261103"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/orderledger"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008"]  # long SQL strings are deliberate; typer defaults are idiomatic
+

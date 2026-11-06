@@ -1,0 +1,20 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check src tests
+      - name: Tests (synthetic fixture only; no Olist data in CI)
+        run: uv run pytest

@@ -1,0 +1,71 @@
+customer_id,customer_unique_id,customer_zip_code_prefix,customer_city,customer_state
+c0000,u000,10000,sao paulo,SP
+c0001,u001,10000,sao paulo,SP
+c0002,u002,10000,salvador,BA
+c0003,u003,10000,rio,RJ
+c0004,u004,10000,porto,RS
+c0005,u005,10000,belo,MG
+c0006,u006,10000,porto,RS
+c0007,u007,10000,porto,RS
+c0008,u008,10000,rio,RJ
+c0009,u009,10000,belo,MG
+c0010,u010,10000,porto,RS
+c0011,u011,10000,salvador,BA
+c0012,u012,10000,salvador,BA
+c0013,u013,10000,belo,MG
+c0014,u014,10000,sao paulo,SP
+c0015,u015,10000,rio,RJ
+c0016,u016,10000,belo,MG
+c0017,u017,10000,rio,RJ
+c0018,u018,10000,sao paulo,SP
+c0019,u019,10000,belo,MG
+c0020,u020,10000,sao paulo,SP
+c0021,u021,10000,porto,RS
+c0022,u022,10000,sao paulo,SP
+c0023,u023,10000,salvador,BA
+c0024,u024,10000,rio,RJ
+c0025,u025,10000,porto,RS
+c0026,u026,10000,sao paulo,SP
+c0027,u027,10000,belo,MG
+c0028,u028,10000,belo,MG
+c0029,u029,10000,rio,RJ
+c0030,u030,10000,sao paulo,SP
+c0031,u031,10000,belo,MG
+c0032,u032,10000,sao paulo,SP
+c0033,u033,10000,porto,RS
+c0034,u034,10000,salvador,BA
+c0035,u035,10000,belo,MG
+c0036,u036,10000,rio,RJ
+c0037,u037,10000,rio,RJ
+c0038,u038,10000,rio,RJ
+c0039,u039,10000,porto,RS
+c0040,u040,10000,belo,MG
+c0041,u041,10000,rio,RJ
+c0042,u042,10000,porto,RS
+c0043,u043,10000,salvador,BA
+c0044,u044,10000,sao paulo,SP
+c0045,u045,10000,sao paulo,SP
+c0046,u046,10000,salvador,BA
+c0047,u047,10000,porto,RS
+c0048,u048,10000,belo,MG
+c0049,u049,10000,salvador,BA
+c0050,u050,10000,belo,MG
+c0051,u051,10000,salvador,BA
+c0052,u052,10000,sao paulo,SP
+c0053,u053,10000,rio,RJ
+c0054,u054,10000,porto,RS
+c0055,u000,10000,belo,MG
+c0056,u001,10000,porto,RS
+c0057,u002,10000,belo,MG
+c0058,u003,10000,sao paulo,SP
+c0059,u004,10000,sao paulo,SP
+c0060,u005,10000,porto,RS
+c0061,u006,10000,rio,RJ
+c0062,u007,10000,porto,RS
+c0063,u008,10000,rio,RJ
+c0064,u009,10000,porto,RS
+c0065,u010,10000,salvador,BA
+c0066,u011,10000,rio,RJ
+c0067,u012,10000,belo,MG
+c0068,u013,10000,belo,MG
+c0069,u014,10000,rio,RJ

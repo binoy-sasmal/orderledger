@@ -1,0 +1,19 @@
+name: orderledger
+version: "0.1.0"
+config-version: 2
+profile: orderledger
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+vars:
+  watermark: 0              # last published arrival_seq; rows with a higher arrival_seq are new
+  checkpoint_date: "1970-01-01"   # simulated "now" of this run (end of the last loaded batch)
+  lookback_days: 7          # aggregates restate dates within this many days of the checkpoint
+  force_from: null          # backfill window (inclusive): recompute these dates and orders
+  force_to: null
+
+models:
+  orderledger:
+    +materialized: view

@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: "Grain: one row per placed order. Lifecycle timestamps and observed status are separate columns."
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: purchase_ts
+        data_tests: [not_null]
+      - name: observed_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [delivered, shipped, canceled, unavailable, invoiced, processing, created, approved]
+              config:
+                where: "observed_status is not null"
+      - name: is_deleted
+        data_tests: [not_null]
+      - name: is_sequence_valid
+        data_tests: [not_null]
+
+  - name: fct_order_items
+    description: "Grain: one row per (order_id, item_no)."
+    columns:
+      - name: item_key
+        data_tests: [unique, not_null]
+      - name: order_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fct_orders')
+                field: order_id
+      - name: product_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_id
+              config:
+                where: "product_id is not null"
+      - name: price
+        data_tests: [not_null]
+
+  - name: dim_customer
+    columns:
+      - name: customer_unique_id
+        data_tests: [unique, not_null]
+
+  - name: dim_product
+    columns:
+      - name: product_id
+        data_tests: [unique, not_null]
+
+  - name: agg_daily_purchases
+    description: "Time basis: purchase date. See docs/metrics.md."
+    columns:
+      - name: purchase_date
+        data_tests: [unique, not_null]
+
+  - name: agg_daily_deliveries
+    description: "Time basis: delivery date. See docs/metrics.md."
+    columns:
+      - name: delivered_date
+        data_tests: [unique, not_null]

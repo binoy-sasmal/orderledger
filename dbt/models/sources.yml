@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: events
+        description: Append-only history of every event batch loaded, duplicates included.
